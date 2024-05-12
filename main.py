@@ -111,7 +111,8 @@ def main():
     proxy_list = get_all_proxy()
     available_proxies = test_proxy(proxy_list)
     print(f'过滤得到 {len(available_proxies)}条数据')
-
+    file_to_delete = open("all.txt", 'w')
+    file_to_delete.close()
     write_to_file(available_proxies,'all.txt')
     end = time.time()
     print(f'可用时总计：{end-start}秒')
