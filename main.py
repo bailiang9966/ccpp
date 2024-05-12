@@ -3,12 +3,12 @@ import requests
 import concurrent.futures
 import time
 import random
-import os  
 
-url_timeout = os.environ.get('url_timeout', 2)
-real_timeout = os.environ.get('real_timeout', 2)
-thread_max = os.environ.get('thread_max', 50)
 
+url_timeout = 2
+real_timeout = 2
+thread_max = 50
+available_proxies=[]
 test_urls = ["https://www.google.com",
             "https://github.com",
             "https://stackoverflow.com",
@@ -85,7 +85,8 @@ def proxy_filter(proxy):
             ts = end-start
             if ts<real_timeout:
                 print(f"代理 {proxy} 延迟:{ts}")
-                return proxy
+                available_proxies.append(proxy)
+                # return proxy
     except requests.exceptions.RequestException as e:
         return None
 def write_to_file(data_list, file_name):
@@ -97,19 +98,20 @@ def write_to_file(data_list, file_name):
     except Exception as e:
         print('Error occurred while writing to the file:', str(e))
 def test_proxy(proxy_list):
-    available_proxies=[]
+    
     with concurrent.futures.ThreadPoolExecutor(max_workers=thread_max) as executor:
         # 将测试任务提交到线程池
         futures = [executor.submit(proxy_filter, item) for item in proxy_list]
 
         # 获取测试结果
-        available_proxies = [future.result() for future in concurrent.futures.as_completed(futures) if future.result()]
-    return available_proxies
+        # available_proxies = [future.result() for future in concurrent.futures.as_completed(futures) if future.result()]
+        # [future.result() for future in concurrent.futures.as_completed(futures) if future.result()]
+
 
 def main():
     start = time.time()
     proxy_list = get_all_proxy()
-    available_proxies = test_proxy(proxy_list)
+    test_proxy(proxy_list)
     print(f'过滤得到 {len(available_proxies)}条数据')
     file_to_delete = open("all.txt", 'w')
     file_to_delete.close()
