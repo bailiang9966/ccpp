@@ -101,8 +101,8 @@ def test_proxy(proxy_list):
     
     with concurrent.futures.ThreadPoolExecutor(max_workers=thread_max) as executor:
         # 将测试任务提交到线程池
-        futures = [executor.submit(proxy_filter, item) for item in proxy_list]
-
+        # futures = [executor.submit(proxy_filter, item) for item in proxy_list]
+        executor.map(proxy_filter, proxy_list)
         # 获取测试结果
         # available_proxies = [future.result() for future in concurrent.futures.as_completed(futures) if future.result()]
         # [future.result() for future in concurrent.futures.as_completed(futures) if future.result()]
