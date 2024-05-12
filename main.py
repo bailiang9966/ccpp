@@ -112,7 +112,7 @@ def main():
     available_proxies = test_proxy(proxy_list)
     print(f'过滤得到 {len(available_proxies)}条数据')
 
-    write_to_file(available_proxies,'proxy.txt')
+    write_to_file(available_proxies,'all.txt')
     end = time.time()
     print(f'可用时总计：{end-start}秒')
 if __name__ == '__main__':
