@@ -7,5 +7,5 @@
   types: http,socks4,socks5
 - main_url: https://raw.githubusercontent.com/Tsprnay/Proxy-lists/master/proxies/
   types: http,https,socks4,socks5
-- main_url: https://raw.githubusercontent.com/r00tee/Proxy-List/main/
-  types: Https,Socks4,Socks5
+# - main_url: https://raw.githubusercontent.com/r00tee/Proxy-List/main/
+#   types: Https,Socks4,Socks5
