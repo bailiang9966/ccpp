@@ -1,5 +1,5 @@
-https://www.twitter.com
+https://www.netflix.com
+https://www.adobe.com
 https://www.microsoft.com
-https://pypi.org
-https://www.twitter.com
-https://www.djangoproject.com
+https://www.python.org
+https://www.coursera.org
