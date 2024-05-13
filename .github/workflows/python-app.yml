@@ -31,8 +31,9 @@ jobs:
     - name: Run script
       run: python main.py
     - name: Commit files
-      uses: ad-m/github-push-action@main
-      with:
-        github_token: ${{ secrets.TOKEN_GITHUB }}
-        branch: main
-        directory: .
+      run: |
+        git config --global user.name "bailiang9966"
+        git config --global user.email "bailiang9966@gmail.com"
+        git add all.txt
+        git commit -m "Update all.txt on `date +'%Y-%m-%d %H:%M:%S'`"
+        git push origin main
