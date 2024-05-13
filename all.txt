@@ -1,5 +1,5 @@
+https://www.djangoproject.com
+https://www.oracle.com
+https://www.facebook.com
+https://www.ibm.com
 https://www.amazon.com
-https://www.microsoft.com
-https://www.apple.com
-https://www.spotify.com
-https://www.bbc.co.uk
