@@ -1,5 +1,5 @@
-https://www.google.com
-https://www.udemy.com
-https://www.adobe.com
-https://www.google.com
-https://www.twitch.tv
+https://www.twitter.com
+https://www.microsoft.com
+https://pypi.org
+https://www.twitter.com
+https://www.djangoproject.com
