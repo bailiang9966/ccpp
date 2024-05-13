@@ -37,5 +37,5 @@ jobs:
         git config --global user.password ${{secrets.TOKEN_GITHUB }}
         git add all.txt  
         git commit -m "Update file  (`date '+%F %H:%M %Z'`)"
-        git push https://${{secrets.TOKEN_GITHUB }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
-
+        git remote add origin https://github.com//${{ github.repository }}.git
+        git push -u origin main
