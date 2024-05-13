@@ -30,10 +30,8 @@ jobs:
         pip install PyYAML requests
     - name: Run script
       run: python main.py
-    - name: Commit files
-      run: |
-        git config --global user.name "bailiang9966"
-        git config --global user.email "bailiang9966@gmail.com"
-        git add all.txt
-        git commit -m "Update all.txt on `date +'%Y-%m-%d %H:%M:%S'`"
-        git push origin main
+    - name: Upload TXT file
+      uses: actions/upload-artifact@v4
+      with:
+        name: txt-file
+        path: all.txt
