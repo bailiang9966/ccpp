@@ -77,7 +77,7 @@ def proxy_filter(proxy):
         'https': proxy,
         'http': proxy
     }
-    url= random.choice(test_urls)
+    url= 'https://www.binance.com/api/v3/ping'
     try:
         start = time.time()
         response = requests.get(url,proxies=proxies, timeout=url_timeout)
