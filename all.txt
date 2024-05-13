@@ -1,5 +1,5 @@
-https://www.djangoproject.com
-https://www.oracle.com
-https://www.facebook.com
-https://www.ibm.com
-https://www.amazon.com
+https://medium.com
+https://pypi.org
+https://www.google.com
+https://www.microsoft.com
+https://www.coursera.org
