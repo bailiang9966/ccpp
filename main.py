@@ -173,7 +173,7 @@ class HAHA():
         
             try:
                 start = time.time()
-                response = requests.get(test_url['url'],proxies=proxies, timeout=2)
+                response = requests.get(test_url['url'],proxies=proxies, timeout=4)
                 if response.status_code == 200:
                     end = time.time()
                     ts = end-start
