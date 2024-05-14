@@ -2,10 +2,15 @@
 on:
     push:
       branches: [ "main" ]
+      paths-ignore:
+        - 'out/**'
     pull_request:
       branches: [ "main" ]
+      paths-ignore:
+        - 'out/**'
     schedule:
       - cron: '*/30 * * * *'
+    
 permissions:
     contents: read
   
