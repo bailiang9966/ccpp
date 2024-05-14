@@ -33,11 +33,10 @@ jobs:
     - name: Run script
       run: python main.py
     
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: out
-        
-    - name: Deploy to GitHub Pages 
-      id: deployment
-      uses: actions/deploy-pages@v4
+    - name: Upload TXT file
+      run: |
+        git config --global user.name "bailiang9966"
+        git config --global user.email "bailiang9966@gmail.com"
+        git add out/
+        git commit -m "Update  on `date +'%Y-%m-%d %H:%M:%S'`"
+        git push 
