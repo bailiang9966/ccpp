@@ -70,6 +70,7 @@ class HAHA():
             proxy_types = proxy_cfg['types'].split(',')
             for proxy_type in proxy_types:
                 url = f"{proxy_cfg['main_url']}{proxy_type}.txt"
+                print(url)
                 try:
                     response = requests.get(url)
                     if response.status_code!=200:
@@ -81,7 +82,7 @@ class HAHA():
                     df['protocol'] = proxy_type
                     
                     df_all.append(df)
-
+                    print(f"数据共:{len(df)}")
                 except requests.exceptions.RequestException as e:
                     print(e)
         self.temp_df = pd.concat(df_all)
