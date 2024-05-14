@@ -95,6 +95,8 @@ class HAHA():
         self.temp_df.drop_duplicates(subset=['host', 'port'], inplace=True)
 
         print(f"总计:{len(self.temp_df)}条数据")
+        self.temp_df = self.temp_df[~self.temp_df['host'].isin(self.black_list)]
+        print(f"去除黑名单后总计:{len(self.temp_df)}条数据")
     def test_host(self,host, port):
         test_result =False
         try:
