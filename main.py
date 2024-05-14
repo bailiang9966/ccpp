@@ -2,123 +2,189 @@ import yaml
 import requests
 import concurrent.futures
 import time
-import random
+import os
+import pandas as pd
 
+import asyncio
+import socket
 
-url_timeout = 2
-real_timeout = 2
-thread_max = 50
-available_proxies=[]
-test_urls = ["https://www.google.com",
-            "https://github.com",
-            "https://stackoverflow.com",
-            "https://www.python.org",
-            "https://www.djangoproject.com",
-            "https://pypi.org",
-            "https://www.kaggle.com",
-            "https://medium.com",
-            "https://www.linkedin.com",
-            "https://www.youtube.com",
-            "https://www.amazon.com",
-            "https://www.facebook.com",
-            "https://www.twitter.com",
-            "https://www.instagram.com",
-            "https://www.netflix.com",
-            "https://www.reddit.com",
-            "https://www.quora.com",
-            "https://www.udemy.com",
-            "https://www.coursera.org",
-            "https://www.wikipedia.org",
-            "https://www.nytimes.com",
-            "https://www.bbc.co.uk",
-            "https://www.ebay.com",
-            "https://www.oracle.com",
-            "https://www.ibm.com",
-            "https://www.microsoft.com",
-            "https://www.apple.com",
-            "https://www.adobe.com",
-            "https://www.spotify.com",
-            
-            "https://www.twitch.tv",]
+class HAHA():
+    url_timeout = 2
+    real_timeout = 2
+    thread_max = 50
+    blacklist_file = 'out/bl.txt'
+    final_csv = 'out/final.csv'
+    test_urls = [{
+        'id':'binance',
+        'url':"https://www.binance.com/api/v3/ping"
+    },{
+        'id':'upbit',
+        'url':"https://upbit.com/robots.txt"
+    },{
+        'id':'okx',
+        'url':"https://www.okx.com/api/v5/public/time"
+    }]
+    def __init__(self) :
+        '''
+        black_list只保存主机
+        final_df 协议/主机/端口/可用性
+        temp_df 协议/主机/端口
+        '''
+        self.black_list = self.get_blacklist()
+        self.final_df = self.get_final_df()
+        self.temp_df = []
 
-def read_yaml(yaml_file ):
-    with open(yaml_file, 'r', encoding='utf-8') as file:
-        yaml_cfg = yaml.safe_load(file)
-    return yaml_cfg
-
-def get_all_proxy():
-    proxy_source =read_yaml('proxy.yaml')
-    all_proxy_list = []
-    unique_hosts = set()
-    for proxy_cfg in proxy_source:
-        proxy_types = proxy_cfg['types'].split(',')
-        for proxy_type in proxy_types:
-            url = f"{proxy_cfg['main_url']}{proxy_type}.txt"
-            try:
-                response = requests.get(url)
-                if response.status_code!=200:
-                    print(f"{url} error ")
-                result = response.text.split('\n')
-                for item in result:
-                    host = item.split(":")[0]
-                    if host not in unique_hosts:
-                        unique_hosts.add(host)
-                        all_proxy_list.append(f"{proxy_type}://{item}")
-            except requests.exceptions.RequestException as e:
-                print(e)
-
-    print(f"总计:{len(all_proxy_list)}")
-    return all_proxy_list
-
-
-
-def proxy_filter(proxy):
-    proxies = {
-        'https': proxy,
-        'http': proxy
-    }
-    url= 'https://www.binance.com/api/v3/ping'
-    try:
-        start = time.time()
-        response = requests.get(url,proxies=proxies, timeout=url_timeout)
-        if response.status_code == 200:
-            end = time.time()
-            ts = end-start
-            if ts<real_timeout:
-                print(f"代理 {proxy} 延迟:{ts}")
-                available_proxies.append(proxy)
-                # return proxy
-    except requests.exceptions.RequestException as e:
-        return None
-def write_to_file(data_list, file_name):
-    try:
-        with open(file_name, 'w') as file:
-            for data in data_list:
-                file.write(str(data) + '\n')
-        print('Data has been successfully written to the file!')
-    except Exception as e:
-        print('Error occurred while writing to the file:', str(e))
-def test_proxy(proxy_list):
+    def get_blacklist(self):
+        data_list = []
+        
+        if os.path.exists(self.blacklist_file):
+            with open(self.blacklist_file, 'r') as file:
+                for line in file:
+                    data_list.append(line.strip())
+            return data_list
+        else:
+            return []
     
-    with concurrent.futures.ThreadPoolExecutor(max_workers=thread_max) as executor:
-        # 将测试任务提交到线程池
-        # futures = [executor.submit(proxy_filter, item) for item in proxy_list]
-        executor.map(proxy_filter, proxy_list)
-        # 获取测试结果
-        # available_proxies = [future.result() for future in concurrent.futures.as_completed(futures) if future.result()]
-        # [future.result() for future in concurrent.futures.as_completed(futures) if future.result()]
+    def get_final_df(self):
+        if os.path.exists(self.final_csv):
+            df = pd.read_csv(self.final_csv,header=0)
+        else:
+            column_names = ['protocol','host','port']
+            for item in self.test_urls:
+                column_names.append(item['id'])
+            df = pd.DataFrame(columns = column_names)
+        return df
+    
+    def read_yaml(self,yaml_file ):
+        with open(yaml_file, 'r', encoding='utf-8') as file:
+            yaml_cfg = yaml.safe_load(file)
+        return yaml_cfg   
+     
+    def  get_all_proxy(self):
+
+        proxy_source =self.read_yaml('proxy.yaml')
+        
+        df_all = []
+        for proxy_cfg in proxy_source:
+            df = pd.DataFrame()
+            proxy_types = proxy_cfg['types'].split(',')
+            for proxy_type in proxy_types:
+                url = f"{proxy_cfg['main_url']}{proxy_type}.txt"
+                try:
+                    response = requests.get(url)
+                    if response.status_code!=200:
+                        print(f"{url} error ")
+                    result = response.text.split('\n')
+                    df =  pd.Series(result)
+                    df = df.str.split(':', expand=True)
+                    df.columns = ['host', 'port']
+                    df['protocol'] = proxy_type
+                    
+                    df_all.append(df)
+
+                except requests.exceptions.RequestException as e:
+                    print(e)
+        self.temp_df = pd.concat(df_all)
+        # self.temp_df[['protocol', 'host', 'port']] = self.temp_df['proxy'].str.split('://|:', expand=True)[[0, 1, 2]]    
+        #将原来
+        self.temp_df = pd.merge(df, self.final_df[['protocol', 'host', 'port']], on=['protocol', 'host', 'port'], how='outer')
+        self.temp_df['port'] = self.temp_df['port'].astype(int)
+        print(f"总计:{len(self.temp_df)}")
+    def test_host(self,host, port):
+        test_result =False
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(0.08)
+            result = sock.connect_ex((host, port))
+            if result == 0:
+                test_result= True
+        except Exception as e:
+            print(f"连接错误: {e}")
+            pass
+        finally:
+            sock.close()
+        return test_result
+    def run(self):
+        start = time.time()
+        #获取所有地址最新代理列表
+        self.get_all_proxy()
+        #对队友代理进行测试
+        self.proxy_filter()
+        #写blacklist
+        self.overwrite_file(self.blacklist_file,self.black_list)
+        #写入可用的csv
+        self.final_df.to_csv(self.final_csv,index=False,header=True)
+        
+        end = time.time()
+        print(f'耗时总计：{end-start}秒')
+    
+    def proxy_filter(self):
+        '''
+        线程池去测试代理是否可用
+        '''
+        
+        # executor = concurrent.futures.ThreadPoolExecutor(max_workers=self.thread_max)  
+
+        for row in self.temp_df.itertuples():
+            # executor.submit(self.test_proxy, sock,row.proxy,row.protocol,row.host,row.port)
+            self.test_proxy( row.protocol,row.host,row.port)
 
 
-def main():
-    start = time.time()
-    proxy_list = get_all_proxy()
-    test_proxy(proxy_list)
-    # print(f'过滤得到 {len(available_proxies)}条数据')
-    file_to_delete = open("all.txt", 'w')
-    file_to_delete.close()
-    write_to_file(available_proxies,'all.txt')
+    def overwrite_file(self,file_path, content):
+        with open(file_path, 'w') as file:
+            if isinstance(content, str):
+                # 如果传入的是字符串，则将字符串写入文件
+                file.write(content)
+            elif isinstance(content, list):
+                # 如果传入的是列表，则按行写入列表内容
+                for line in content:
+                    file.write(line + '\n')
 
-    end = time.time()
-    print(f'可用时总计：{end-start}秒')
+    def test_proxy(self,protocol,host,port):
+        '''
+        主机连接失败直接放到blacklist
+        test_urls全部超时也放到blacklist
+        '''
+        p = f"{protocol}://{host}:{port}"
+        proxies = {
+            'https': p,
+            'http': p,
+        }
+
+        #如果主机连接失败 直接放到black_list
+
+        if not self.test_host(host,port):
+            self.black_list.append(host)
+            return
+        proxy_delays =[]
+        proxy_final = [protocol,host,port]
+        for test_url in self.test_urls:
+        
+            try:
+                start = time.time()
+                response = requests.get(test_url['url'],proxies=proxies, timeout=3)
+                if response.status_code == 200:
+                    end = time.time()
+                    ts = end-start
+                    proxy_delays.append(ts)
+                    if ts<self.real_timeout:
+                        print(f"代理 {p} 延迟:{ts} url:{test_url}")
+                        
+                        # return proxy
+            except requests.exceptions.RequestException as e:
+                proxy_delays.append(999)
+        #延迟小于2的放入final_df
+        if any(num < 2 for num in proxy_delays):
+            proxy_final.extend(proxy_delays)
+            self.final_df.loc[len(self.final_df)] = proxy_final
+        #延迟全大于3的放入black_list
+        elif not any(num < 3 for num in proxy_delays):
+            self.black_list.append(host)
+
+
+
+
+    
 if __name__ == '__main__':
-    main()
+    hh = HAHA()
+    hh.run()
