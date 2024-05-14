@@ -180,7 +180,8 @@ class HAHA():
                     proxy_delays.append( round(ts, 3))
                     if ts<self.real_timeout:
                         print(f"代理 {p} 延迟:{ts} url:{test_url['id']}")
-                        
+                else:
+                    proxy_delays.append(999)        
                         # return proxy
             except requests.exceptions.RequestException as e:
                 proxy_delays.append(999)
