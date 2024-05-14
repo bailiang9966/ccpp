@@ -10,7 +10,7 @@ import socket
 
 class HAHA():
     url_timeout = 2
-    real_timeout = 2
+    real_timeout = 3
     thread_max = 80
     blacklist_file = 'out/bl.txt'
     final_csv = 'out/final.csv'
@@ -95,8 +95,8 @@ class HAHA():
         self.temp_df.drop_duplicates(subset=['host', 'port'], inplace=True)
 
         print(f"总计:{len(self.temp_df)}条数据")
-        self.temp_df = self.temp_df[~self.temp_df['host'].isin(self.black_list)]
-        print(f"去除黑名单后总计:{len(self.temp_df)}条数据")
+        # self.temp_df = self.temp_df[~self.temp_df['host'].isin(self.black_list)]
+        # print(f"去除黑名单后总计:{len(self.temp_df)}条数据")
         self.final_df.drop(self.final_df.index, inplace=True)
     def test_host(self,host, port):
         test_result =False
@@ -185,7 +185,7 @@ class HAHA():
             except requests.exceptions.RequestException as e:
                 proxy_delays.append(999)
         #延迟小于2的放入final_df
-        if any(num < 1.5 for num in proxy_delays):
+        if any(num < 2.5 for num in proxy_delays):
             proxy_final.extend(proxy_delays)
             self.final_df.loc[len(self.final_df)] = proxy_final
         #延迟全大于3的放入black_list
