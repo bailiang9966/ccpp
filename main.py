@@ -5,13 +5,13 @@ import time
 import os
 import pandas as pd
 
-import asyncio
+
 import socket
 
 class HAHA():
     url_timeout = 2
     real_timeout = 2
-    thread_max = 50
+    thread_max = 80
     blacklist_file = 'out/bl.txt'
     final_csv = 'out/final.csv'
     test_urls = [{
@@ -75,21 +75,25 @@ class HAHA():
                     response = requests.get(url)
                     if response.status_code!=200:
                         print(f"{url} error ")
+
                     result = response.text.split('\n')
+                    if result[-1] =='':
+                        result.pop()
                     df =  pd.Series(result)
                     df = df.str.split(':', expand=True)
                     df.columns = ['host', 'port']
+                    df['port'] = df['port'].astype(int)
                     df['protocol'] = proxy_type
-                    
                     df_all.append(df)
                     print(f"数据共:{len(df)}")
                 except requests.exceptions.RequestException as e:
                     print(e)
+        
         self.temp_df = pd.concat(df_all)
-        # self.temp_df[['protocol', 'host', 'port']] = self.temp_df['proxy'].str.split('://|:', expand=True)[[0, 1, 2]]    
-        #将原来
-        self.temp_df = pd.merge(df, self.final_df[['protocol', 'host', 'port']], on=['protocol', 'host', 'port'], how='outer')
-        self.temp_df['port'] = self.temp_df['port'].astype(int)
+        self.temp_df = pd.merge(self.temp_df, self.final_df[['protocol', 'host', 'port']], on=['protocol', 'host', 'port'], how='left')
+
+        self.temp_df.drop_duplicates(subset=['host', 'port'], inplace=True)
+
         print(f"总计:{len(self.temp_df)}条数据")
     def test_host(self,host, port):
         test_result =False
