@@ -104,7 +104,7 @@ class HAHA():
         try:
             
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(0.08)
+            sock.settimeout(0.1)
             result = sock.connect_ex((host, port))
             if result == 0:
                 test_result= True
@@ -173,7 +173,7 @@ class HAHA():
         
             try:
                 start = time.time()
-                response = requests.get(test_url['url'],proxies=proxies, timeout=4)
+                response = requests.get(test_url['url'],proxies=proxies, timeout=5)
                 if response.status_code == 200:
                     end = time.time()
                     ts = end-start
