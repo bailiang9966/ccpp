@@ -125,21 +125,16 @@ class HAHA():
         print(f'耗时总计：{end-start}秒')
     
     def proxy_filter(self):
-        '''
-        线程池去测试代理是否可用
-        '''
-        
-        executor = concurrent.futures.ThreadPoolExecutor(max_workers=self.thread_max)  
-        # index = 0
-        for row in self.temp_df.itertuples():
-            executor.submit(self.test_proxy, row.protocol,row.host,row.port)
-            # self.test_proxy( row.protocol,row.host,row.port)
-            # index+=1
-            # print(f"index{index}")
-            # if index >100:
-                
-            #     break
 
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=self.thread_max)  
+        futures = []
+        for row in self.temp_df.itertuples():
+            future = executor.submit(self.test_proxy, row.protocol,row.host,row.port)
+            futures.append(future)
+
+        # 等待所有任务完成
+        for future in concurrent.futures.as_completed(futures):
+            result = future.result()
 
     def overwrite_file(self,file_path, content):
         with open(file_path, 'w') as file:
@@ -179,7 +174,7 @@ class HAHA():
                     ts = end-start
                     proxy_delays.append(ts)
                     if ts<self.real_timeout:
-                        print(f"代理 {p} 延迟:{ts} url:{test_url}")
+                        print(f"代理 {p} 延迟:{ts} url:{test_url['url']}")
                         
                         # return proxy
             except requests.exceptions.RequestException as e:
