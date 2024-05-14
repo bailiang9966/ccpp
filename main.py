@@ -89,7 +89,7 @@ class HAHA():
         #将原来
         self.temp_df = pd.merge(df, self.final_df[['protocol', 'host', 'port']], on=['protocol', 'host', 'port'], how='outer')
         self.temp_df['port'] = self.temp_df['port'].astype(int)
-        print(f"总计:{len(self.temp_df)}")
+        print(f"总计:{len(self.temp_df)}条数据")
     def test_host(self,host, port):
         test_result =False
         try:
@@ -99,7 +99,7 @@ class HAHA():
             if result == 0:
                 test_result= True
         except Exception as e:
-            print(f"连接错误: {e}")
+            print(f"{host}连接错误: {e}")
             pass
         finally:
             sock.close()
@@ -108,7 +108,8 @@ class HAHA():
         start = time.time()
         #获取所有地址最新代理列表
         self.get_all_proxy()
-        #对队友代理进行测试
+
+        #对代理进行测试
         self.proxy_filter()
         #写blacklist
         self.overwrite_file(self.blacklist_file,self.black_list)
