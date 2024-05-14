@@ -99,14 +99,16 @@ class HAHA():
         print(f"去除黑名单后总计:{len(self.temp_df)}条数据")
     def test_host(self,host, port):
         test_result =False
+        
         try:
+            
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(0.08)
             result = sock.connect_ex((host, port))
             if result == 0:
                 test_result= True
         except Exception as e:
-            print(f"{host}连接错误: {e}")
+            print(f"连接错误: {host}:{port} {e}")
             pass
         finally:
             sock.close()
@@ -174,9 +176,9 @@ class HAHA():
                 if response.status_code == 200:
                     end = time.time()
                     ts = end-start
-                    proxy_delays.append(ts)
+                    proxy_delays.append( round(ts, 3))
                     if ts<self.real_timeout:
-                        print(f"代理 {p} 延迟:{ts} url:{test_url['url']}")
+                        print(f"代理 {p} 延迟:{ts} url:{test_url['id']}")
                         
                         # return proxy
             except requests.exceptions.RequestException as e:
