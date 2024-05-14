@@ -187,7 +187,13 @@ class HAHA():
         #延迟小于2的放入final_df
         if any(num < 2.5 for num in proxy_delays):
             proxy_final.extend(proxy_delays)
-            self.final_df.loc[len(self.final_df)] = proxy_final
+            try:
+                self.final_df.loc[len(self.final_df)] = proxy_final
+            except Exception as e:
+                print("final_df")
+                print(self.final_df.columns)
+                print(proxy_final)
+                print(e)
         #延迟全大于3的放入black_list
         elif not any(num < 3 for num in proxy_delays):
             self.black_list.append(host)
