@@ -123,11 +123,16 @@ class HAHA():
         线程池去测试代理是否可用
         '''
         
-        # executor = concurrent.futures.ThreadPoolExecutor(max_workers=self.thread_max)  
-
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=self.thread_max)  
+        # index = 0
         for row in self.temp_df.itertuples():
-            # executor.submit(self.test_proxy, sock,row.proxy,row.protocol,row.host,row.port)
-            self.test_proxy( row.protocol,row.host,row.port)
+            executor.submit(self.test_proxy, row.protocol,row.host,row.port)
+            # self.test_proxy( row.protocol,row.host,row.port)
+            # index+=1
+            # print(f"index{index}")
+            # if index >100:
+                
+            #     break
 
 
     def overwrite_file(self,file_path, content):
@@ -162,7 +167,7 @@ class HAHA():
         
             try:
                 start = time.time()
-                response = requests.get(test_url['url'],proxies=proxies, timeout=3)
+                response = requests.get(test_url['url'],proxies=proxies, timeout=2)
                 if response.status_code == 200:
                     end = time.time()
                     ts = end-start
@@ -174,7 +179,7 @@ class HAHA():
             except requests.exceptions.RequestException as e:
                 proxy_delays.append(999)
         #延迟小于2的放入final_df
-        if any(num < 2 for num in proxy_delays):
+        if any(num < 1.5 for num in proxy_delays):
             proxy_final.extend(proxy_delays)
             self.final_df.loc[len(self.final_df)] = proxy_final
         #延迟全大于3的放入black_list
