@@ -196,8 +196,8 @@ class HAHA():
                 print(proxy_final)
                 print(e)
         #延迟全大于3的放入black_list
-        elif not any(num < 3 for num in proxy_delays):
-            self.black_list.append(host)
+        # elif not any(num < 3 for num in proxy_delays):
+        #     self.black_list.append(host)
 
 
 
