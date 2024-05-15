@@ -110,6 +110,7 @@ class HAHA():
                 test_result= True
         except Exception as e:
             print(f"连接错误: {host}:{port} {e}")
+            self.black_list.append(host)
             pass
         finally:
             sock.close()
@@ -121,7 +122,8 @@ class HAHA():
 
         #对代理进行测试
         self.proxy_filter()
-        #写blacklist
+        #写blacklist先去重
+        self.black_list = list(set(self.black_list))
         self.overwrite_file(self.blacklist_file,self.black_list)
         #写入可用的csv
         self.final_df.to_csv(self.final_csv,index=False,header=True)
@@ -165,7 +167,7 @@ class HAHA():
         #如果主机连接失败 直接放到black_list
 
         if not self.test_host(host,port):
-            self.black_list.append(host)
+            # self.black_list.append(host)
             return
         proxy_delays =[]
         proxy_final = [protocol,host,port]
