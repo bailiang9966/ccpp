@@ -9,7 +9,7 @@ on:
       paths-ignore:
         - 'out/**'
     schedule:
-      - cron: '*/30 10-20 * * *'
+      - cron: '*/30 18-04 * * *'
     
 permissions:
     contents: read
