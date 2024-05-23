@@ -16,7 +16,7 @@ class HAHA():
     final_csv = 'out/final.csv'
     test_urls = [{
         'id':'binance',
-        'url':"https://www.binance.com/api/v3/ping"
+        'url':"https://www.binance.com/bapi/composite/v1/public/market/notice/get?rows=1&page=1"
     },{
         'id':'upbit',
         'url':"https://upbit.com/robots.txt"
