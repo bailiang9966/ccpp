@@ -18,6 +18,9 @@ class HAHA():
         'id':'binance',
         'url':"https://www.binance.com/bapi/composite/v1/public/market/notice/get?rows=1&page=1"
     },{
+        'id':'binance_uf',
+        'url':"https://fapi.binance.com/fapi/v1/exchangeInfo"
+    },{
         'id':'upbit',
         'url':"https://upbit.com/robots.txt"
     },{
