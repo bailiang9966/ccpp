@@ -11,7 +11,7 @@ import socket
 class HAHA():
     url_timeout = 2
     real_timeout = 3
-    thread_max = 80
+    thread_max = 200
     blacklist_file = 'out/bl.txt'
     final_csv = 'out/final.csv'
     test_urls = [{
