@@ -118,7 +118,7 @@ class HAHA():
         # self.overwrite_file(self.blacklist_file,self.black_list)
         #写入可用的csv
         # self.final_df.to_csv(self.final_csv,index=False,header=True)
-        with open("out/output.txt", "w") as file:
+        with open("out/output.json", "w") as file:
             # 将字典转换为字符串，并写入文件
             # file.write(str(self.proxys))
             json.dump(self.proxys, file, indent=4)
