@@ -1,3 +1,4 @@
+import json
 import yaml
 import requests
 import concurrent.futures
@@ -119,7 +120,8 @@ class HAHA():
         # self.final_df.to_csv(self.final_csv,index=False,header=True)
         with open("out/output.txt", "w") as file:
             # 将字典转换为字符串，并写入文件
-            file.write(str(self.proxys))
+            # file.write(str(self.proxys))
+            json.dump(self.proxys, file, indent=4)
         end = time.time()
         print(f'耗时总计：{end-start}秒')
     
