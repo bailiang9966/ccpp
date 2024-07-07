@@ -14,28 +14,18 @@ class HAHA():
     thread_max = 200
     blacklist_file = 'out/bl.txt'
     final_csv = 'out/final.csv'
-    test_urls = [{
-        'id':'binance',
-        'url':"https://www.binance.com/bapi/composite/v1/public/market/notice/get?rows=1&page=1"
-    },{
-        'id':'binance_uf',
-        'url':"https://fapi.binance.com/fapi/v1/exchangeInfo"
-    },{
-        'id':'upbit',
-        'url':"https://upbit.com/robots.txt"
-    },{
-        'id':'okx',
-        'url':"https://www.okx.com/api/v5/public/time"
-    }]
+    test_urls = {
+        'binance':"https://www.binance.com/bapi/composite/v1/public/market/notice/get?rows=1&page=1",
+        'upbit':"https://api-manager.upbit.com/api/v1/announcements?os=web&page=1&per_page=1&category=trade"
+    }
     def __init__(self) :
-        '''
-        black_list只保存主机
-        final_df 协议/主机/端口/可用性
-        temp_df 协议/主机/端口
-        '''
+
         self.black_list = self.get_blacklist()
-        self.final_df = self.get_final_df()
-        self.temp_df = []
+        # self.final_df = self.get_final_df()
+        # self.temp_df = []
+        self.proxys =  {key: [] for key in self.test_urls}
+
+
 
     def get_blacklist(self):
         data_list = []
@@ -93,14 +83,11 @@ class HAHA():
                     print(e)
         
         self.temp_df = pd.concat(df_all)
-        self.temp_df = pd.merge(self.temp_df, self.final_df[['protocol', 'host', 'port']], on=['protocol', 'host', 'port'], how='left')
-
         self.temp_df.drop_duplicates(subset=['host', 'port'], inplace=True)
 
         print(f"总计:{len(self.temp_df)}条数据")
-        # self.temp_df = self.temp_df[~self.temp_df['host'].isin(self.black_list)]
-        # print(f"去除黑名单后总计:{len(self.temp_df)}条数据")
-        self.final_df.drop(self.final_df.index, inplace=True)
+
+        # self.final_df.drop(self.final_df.index, inplace=True)
     def test_host(self,host, port):
         test_result =False
         
@@ -126,11 +113,13 @@ class HAHA():
         #对代理进行测试
         self.proxy_filter()
         #写blacklist先去重
-        self.black_list = list(set(self.black_list))
-        self.overwrite_file(self.blacklist_file,self.black_list)
+        # self.black_list = list(set(self.black_list))
+        # self.overwrite_file(self.blacklist_file,self.black_list)
         #写入可用的csv
-        self.final_df.to_csv(self.final_csv,index=False,header=True)
-        
+        # self.final_df.to_csv(self.final_csv,index=False,header=True)
+        with open("out/output.txt", "w") as file:
+            # 将字典转换为字符串，并写入文件
+            file.write(str(self.proxys))
         end = time.time()
         print(f'耗时总计：{end-start}秒')
     
@@ -174,32 +163,33 @@ class HAHA():
             return
         proxy_delays =[]
         proxy_final = [protocol,host,port]
-        for test_url in self.test_urls:
+        for exchange, url in self.test_urls.items():
         
             try:
                 start = time.time()
-                response = requests.get(test_url['url'],proxies=proxies, timeout=5)
+                response = requests.get(url,proxies=proxies, timeout=5)
                 if response.status_code == 200:
                     end = time.time()
                     ts = end-start
-                    proxy_delays.append( round(ts, 3))
-                    if ts<self.real_timeout:
-                        print(f"代理 {p} 延迟:{ts} url:{test_url['id']}")
-                else:
-                    proxy_delays.append(999)        
-                        # return proxy
+                    if ts < 2.5:
+                        self.proxys[exchange].append(p)
+                    # proxy_delays.append( round(ts, 3))
+                    # if ts<self.real_timeout:
+                    #     print(f"代理 {p} 延迟:{ts} url:{test_url['id']}")
+
             except requests.exceptions.RequestException as e:
-                proxy_delays.append(999)
-        #延迟小于2的放入final_df
-        if any(num < 2.5 for num in proxy_delays):
-            proxy_final.extend(proxy_delays)
-            try:
-                self.final_df.loc[len(self.final_df)] = proxy_final
-            except Exception as e:
-                print("final_df")
-                print(self.final_df.columns)
-                print(proxy_final)
-                print(e)
+                pass
+                # proxy_delays.append(999)
+        # #延迟小于2的放入final_df
+        # if any(num < 2.5 for num in proxy_delays):
+        #     proxy_final.extend(proxy_delays)
+        #     try:
+        #         self.final_df.loc[len(self.final_df)] = proxy_final
+        #     except Exception as e:
+        #         print("final_df")
+        #         print(self.final_df.columns)
+        #         print(proxy_final)
+        #         print(e)
         #延迟全大于3的放入black_list
         # elif not any(num < 3 for num in proxy_delays):
         #     self.black_list.append(host)
