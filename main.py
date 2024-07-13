@@ -12,12 +12,14 @@ import socket
 class HAHA():
     url_timeout = 2
     real_timeout = 3
-    thread_max = 200
+    thread_max = 400
     blacklist_file = 'out/bl.txt'
     final_csv = 'out/final.csv'
     test_urls = {
         'binance':"https://www.binance.com/bapi/composite/v1/public/market/notice/get?rows=1&page=1",
-        'upbit':"https://api-manager.upbit.com/api/v1/announcements?os=web&page=1&per_page=1&category=trade"
+        'upbit':"https://api-manager.upbit.com/api/v1/announcements?os=web&page=1&per_page=1&category=trade",
+        'bn_uf':"https://fapi.binance.com/fapi/v1/ping",
+        'bn_spot':"https://api.binance.com/api/v3/ping",
     }
     def __init__(self) :
 
