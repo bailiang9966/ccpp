@@ -14,7 +14,7 @@ class ORDER_DATA_GATHER():
 
         self.symbols =  self.get_symbols().keys()
         # self.symbols =  ['BTC','ETH','TON']
-        self.csv_dir = '/out'
+        self.csv_dir = 'out'
         self.executor = ThreadPoolExecutor(max_workers=100)
         self.use_proxy = True
         pass
